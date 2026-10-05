@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCQP09 Study Tracker</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 18px;
+}
+
+.header {
+  text-align: center;
+  padding: 20px 10px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 25px;
+}
+
+.header p {
+  color: #94a3b8;
+}
+
+.countdown {
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  border-radius: 22px;
+  padding: 25px;
+  text-align: center;
+  margin-bottom: 18px;
+  box-shadow: 0 10px 30px #0005;
+}
+
+.countdown .days {
+  font-size: 55px;
+  font-weight: bold;
+}
+
+.countdown span {
+  font-size: 17px;
+}
+
+.card {
+  background: #1e293b;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 19px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 13px;
+  margin: 7px 0;
+  border: none;
+  border-radius: 11px;
+  background: #334155;
+  color: white;
+  font-size: 15px;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 11px;
+  background: #7c3aed;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #334155;
+  padding: 12px;
+  border-radius: 11px;
+  margin: 8px 0;
+}
+
+.task input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+}
+
+.task.completed {
+  opacity: .55;
+  text-decoration: line-through;
+}
+
+.delete {
+  width: auto;
+  margin: 0 0 0 auto;
+  padding: 5px 9px;
+  background: #ef4444;
+  font-size: 12px;
+}
+
+.progress-bg {
+  height: 12px;
+  background: #334155;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress {
+  height: 100%;
+  background: #22c55e;
+  width: 0%;
+  transition: .3s;
+}
+
+.quote {
+  text-align: center;
+  color: #c4b5fd;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.footer {
+  text-align: center;
+  color: #64748b;
+  font-size: 12px;
+  padding: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>📚 SCQP09 Study Tracker</h1>
+    <p>6 October 2026 → 4 March 2027</p>
+  </div>
+
+  <div class="countdown">
+    <div class="days" id="days">149</div>
+    <span>DAYS LEFT 🔥</span>
+  </div>
+
+  <div class="card">
+    <h2>📅 Today's Date</h2>
+    <p id="today"></p>
+  </div>
+
+  <div class="card">
+    <h2>🎯 My Study Targets</h2>
+
+    <input
+      id="taskInput"
+      type="text"
+      placeholder="Kal kya padhna hai?"
+    >
+
+    <button onclick="addTask()">＋ Add Topic</button>
+
+    <div id="tasks"></div>
+
+    <div style="margin-top:15px;">
+      <span id="progressText">0% completed</span>
+      <div class="progress-bg">
+        <div class="progress" id="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📝 Today's Notes</h2>
+
+    <textarea
+      id="notes"
+      rows="6"
+      placeholder="Aaj kya padha? Kya yaad rakhna hai?..."
+    ></textarea>
+
+    <button onclick="saveNotes()">💾 Save Notes</button>
+  </div>
+
+  <div class="card">
+    <h2>🔥 Motivation</h2>
+    <div class="quote">
+      "Days are going down. Your preparation should go UP. 🚀"
+    </div>
+  </div>
+
+  <div class="footer">
+    SCQP09 • Your goal is waiting 🎯
+  </div>
+
+</div>
+
+<script>
+
+const examDate = new Date("2027-03-04T00:00:00");
+
+function updateCountdown() {
+
+  const now = new Date();
+
+  const startDate = new Date("2026-10-06T00:00:00");
+
+  let diff = Math.ceil(
+    (examDate - now) / (1000 * 60 * 60 * 24)
+  );
+
+  if (now < startDate) {
+    diff = 149;
+  }
+
+  if (diff < 0) {
+    diff = 0;
+  }
+
+  document.getElementById("days").textContent = diff;
+
+  if (diff === 0) {
+    document.querySelector(".countdown span").textContent =
+      "🎯 EXAM DAY";
+  }
+}
+
+function showDate() {
+
+  const today = new Date();
+
+  document.getElementById("today").textContent =
+    today.toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+}
+
+let tasks = JSON.parse(
+  localStorage.getItem("scqp09_tasks") || "[]"
+);
+
+function saveTasks() {
+  localStorage.setItem(
+    "scqp09_tasks",
+    JSON.stringify(tasks)
+  );
+}
+
+function addTask() {
+
+  const input = document.getElementById("taskInput");
+
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  tasks.push({
+    text: text,
+    completed: false
+  });
+
+  input.value = "";
+
+  saveTasks();
+  renderTasks();
+}
+
+function toggleTask(index) {
+
+  tasks[index].completed =
+    !tasks[index].completed;
+
+  saveTasks();
+  renderTasks();
+}
+
+function deleteTask(index) {
+
+  tasks.splice(index, 1);
+
+  saveTasks();
+  renderTasks();
+}
+
+function renderTasks() {
+
+  const container =
+    document.getElementById("tasks");
+
+  container.innerHTML = "";
+
+  tasks.forEach((task, index) => {
+
+    const div = document.createElement("div");
+
+    div.className =
+      "task " +
+      (task.completed ? "completed" : "");
+
+    div.innerHTML = `
+      <input
+        type="checkbox"
+        ${task.completed ? "checked" : ""}
+        onchange="toggleTask(${index})"
+      >
+
+      <span>${escapeHtml(task.text)}</span>
+
+      <button
+        class="delete"
+        onclick="deleteTask(${index})"
+      >
+        ✕
+      </button>
+    `;
+
+    container.appendChild(div);
+  });
+
+  updateProgress();
+}
+
+function updateProgress() {
+
+  const total = tasks.length;
+
+  const completed =
+    tasks.filter(t => t.completed).length;
+
+  const percentage =
+    total === 0
+      ? 0
+      : Math.round((completed / total) * 100);
+
+  document.getElementById("progress").style.width =
+    percentage + "%";
+
+  document.getElementById("progressText").textContent =
+    percentage + "% completed";
+}
+
+function saveNotes() {
+
+  const notes =
+    document.getElementById("notes").value;
+
+  localStorage.setItem(
+    "scqp09_notes",
+    notes
+  );
+
+  alert("Notes saved ✅");
+}
+
+function loadNotes() {
+
+  const notes =
+    localStorage.getItem("scqp09_notes");
+
+  if (notes) {
+    document.getElementById("notes").value =
+      notes;
+  }
+}
+
+function escapeHtml(text) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent = text;
+
+  return div.innerHTML;
+}
+
+updateCountdown();
+showDate();
+renderTasks();
+loadNotes();
+
+setInterval(updateCountdown, 60000);
+
+</script>
+
+</body>
+</html>
